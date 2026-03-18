@@ -4,36 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analitik Sales - Kospinus</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; padding-bottom: 90px; }
         .header-area { background: white; padding: 20px 15px; display: flex; justify-content: space-between; align-items: center; }
-        .header-title { font-weight: 700; font-size: 22px; margin: 0; } /* [cite: 3, 16] */
+        .header-title { font-weight: 700; font-size: 22px; margin: 0; }
         .card-custom { border: none; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin: 15px; padding: 20px; background: white; }
-        .chart-label { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 5px; } /* [cite: 4, 18, 13, 27] */
+        .chart-label { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 5px; }
         .legend-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; margin-right: 8px; }
-        .sub-text { font-size: 11px; color: #888; margin-bottom: 15px; } /* [cite: 5, 20, 28] */
+        .sub-text { font-size: 11px; color: #888; margin-bottom: 15px; }
         
-        /* Bottom Navigation [cite: 50, 51, 52, 53] */
+        /* Navigasi Bawah sesuai desain */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #f0f0f0; z-index: 1000; }
         .nav-item { text-align: center; color: #bfbfbf; text-decoration: none; font-size: 11px; flex: 1; }
         .nav-item.active { color: #b01a2c; font-weight: 700; }
         .nav-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+        /* Custom Dropdown Style */
+        .btn-filter { border: 1px solid #eee; border-radius: 8px; font-size: 12px; padding: 4px 12px; background: #fff; }
     </style>
 </head>
 <body>
 
     <div class="header-area">
         <h1 class="header-title">Analitik</h1>
-        <span style="font-size: 20px; color: #999;">ⓘ</span>
+        <span style="font-size: 20px;">ⓘ</span>
     </div>
 
     <div class="card-custom">
         <div class="d-flex justify-content-between align-items-center">
             <div class="chart-label">Leads</div>
-            <button class="btn btn-sm border bg-light" style="font-size: 11px;">Tahunan ▾</button>
+            <button class="btn-filter">Tahunan ▾</button>
         </div>
         <p class="sub-text">Grafik perbandingan pencapaian dan target leads</p>
         <canvas id="leadsChart" height="220"></canvas>
@@ -46,120 +49,110 @@
             <div class="col-6 position-relative">
                 <canvas id="statusChart"></canvas>
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                    <h4 class="m-0 fw-bold" id="totalCount">0</h4> <small class="text-muted" style="font-size: 10px;">Orang</small> </div>
+                    <h4 class="m-0 fw-bold" id="totalCount">0</h4>
+                    <small class="text-muted" style="font-size: 10px;">Orang</small>
+                </div>
             </div>
             <div class="col-6">
                 <div class="d-flex justify-content-between mb-2 small">
-                    <span><span class="legend-dot" style="background: #2F80ED;"></span> Waiting</span> <b id="valWaiting">0</b> </div>
+                    <span><span class="legend-dot" style="background: #2F80ED;"></span> Waiting</span> <b id="valWaiting">0</b>
+                </div>
                 <div class="d-flex justify-content-between mb-2 small">
-                    <span><span class="legend-dot" style="background: #27AE60;"></span> Response</span> <b id="valResponse">0</b> </div>
+                    <span><span class="legend-dot" style="background: #27AE60;"></span> Response</span> <b id="valResponse">0</b>
+                </div>
                 <div class="d-flex justify-content-between small">
-                    <span><span class="legend-dot" style="background: #1C1C1E;"></span> Not Response</span> <b id="valNot">0</b> </div>
+                    <span><span class="legend-dot" style="background: #1C1C1E;"></span> Not Response</span> <b id="valNot">0</b>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="card-custom">
         <div class="chart-label mb-4">Pencapaian Target</div>
+        
         <div class="text-center mb-5">
-            <p class="small fw-bold mb-3">Targetku</p> <div style="height: 120px; position: relative;">
+            <p class="small fw-bold mb-3">Targetku</p>
+            <div style="height: 120px; position: relative;">
                 <canvas id="targetKuChart"></canvas>
                 <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);">
-                    <span style="color: #b01a2c; font-size: 11px;">● Leads (60%)</span> <h3 class="fw-bold m-0" id="leadsAchieved">0</h3> <small class="text-muted">/200 Leads</small> </div>
+                    <span style="color: #b01a2c; font-size: 11px;">● Leads (60%)</span>
+                    <h3 class="fw-bold m-0">120</h3>
+                    <small class="text-muted">/200 Leads</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <p class="small fw-bold mb-3">Target Cabang</p>
+            <div style="height: 180px; position: relative;">
+                <canvas id="targetCabangChart"></canvas>
+            </div>
+            <div class="row mt-3 text-start px-3">
+                <div class="col-6">
+                    <span style="color: #b01a2c; font-size: 10px;">● Leads (60%)</span>
+                    <h6 class="fw-bold mb-0">900</h6>
+                    <small class="text-muted">/1500 Leads</small>
+                </div>
+                <div class="col-6">
+                    <span style="color: #27AE60; font-size: 10px;">● Disbursement (46%)</span>
+                    <h6 class="fw-bold mb-0">230.000.000</h6>
+                    <small class="text-muted">/500.000.000</small>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="bottom-nav">
-        <a href="#" class="nav-item">🏠<br>Beranda</a>
-        <a href="#" class="nav-item active">📊<br>Analitik</a>
-        <a href="#" class="nav-item">💼<br>Produk</a>
-        <a href="#" class="nav-item">👤<br>Akun</a>
+        <a href="#" class="nav-item"><span class="nav-icon">⌂</span>Beranda</a>
+        <a href="#" class="nav-item active"><span class="nav-icon">📊</span>Analitik</a>
+        <a href="#" class="nav-item"><span class="nav-icon">💼</span>Produk</a>
+        <a href="#" class="nav-item"><span class="nav-icon">👤</span>Akun</a>
     </div>
 
 <script>
-// Data diambil dari kospinus001.v_sales_leads_list.json
-const rawData = [
-    { "_id": "D2026031700006", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031700005", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
-    { "_id": "D2026031700004", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031700003", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031700002", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031700001", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031600003", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031600002", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
-    { "_id": "D2026031600001", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031400001", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031300010", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031300009", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031300008", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031300007", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031300006", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031300005", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031200069", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
-    { "_id": "D2026031200067", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
-    { "_id": "D2026031200059", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031200058", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
-    { "_id": "D2026031200053", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031200052", "status": { "lead": "WAITING" }, "scoring_grade": null },
-    { "_id": "D2026031200049", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
-    { "_id": "D2026031200048", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
-    { "_id": "D2026031200042", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031200039", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031200038", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031200037", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031200036", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
-    { "_id": "D2026031200035", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" }
-    // ... (data berlanjut untuk entri lainnya dalam file)
+// Data JSON kamu 
+const salesData = [
+    { "_id":"D2026031000028", "status":{"lead":"ON PROCESS"}, "scoring_grade":"reject" },
+    { "_id":"D2026031000029", "status":{"lead":"DONE"}, "scoring_grade":"A" }
 ];
 
-function processData() {
-    let waiting = 0;   // Status ON PROCESS [cite: 29]
-    let response = 0;  // Status DONE [cite: 32]
-    let notResponse = 0; // Lainnya [cite: 36]
-
-    rawData.forEach(item => {
-        const s = item.status.lead.toUpperCase();
-        if(s === "ON PROCESS") waiting++;
-        else if(s === "DONE") response++;
+// Proses data untuk Status Pemohon [cite: 13, 15]
+function initData() {
+    let waiting = 0, response = 0, notResponse = 0;
+    salesData.forEach(d => {
+        if(d.status.lead === "ON PROCESS") waiting++;
+        else if(d.status.lead === "DONE") response++;
         else notResponse++;
     });
-
-    // Update elemen UI
-    document.getElementById('totalCount').innerText = rawData.length;
+    
+    document.getElementById('totalCount').innerText = salesData.length;
     document.getElementById('valWaiting').innerText = waiting;
     document.getElementById('valResponse').innerText = response;
     document.getElementById('valNot').innerText = notResponse;
-    document.getElementById('leadsAchieved').innerText = response; 
-
     return [waiting, response, notResponse];
 }
 
-const counts = processData();
+const statusCounts = initData();
 
-// 1. Leads Chart (Dummy Data untuk tren bulanan)
+// 1. Leads Bar Chart 
 new Chart(document.getElementById('leadsChart'), {
     type: 'bar',
     data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'],
         datasets: [
-            { label: 'Data Masuk', data: [125, 105, 80, 50, 125, 105], backgroundColor: '#b01a2c', borderRadius: 4 },
-            { label: 'Data Prospect', data: [100, 70, 85, 70, 100, 70], backgroundColor: '#27AE60', borderRadius: 4 }
+            { label: 'Data Masuk', data: [125, 105, 80, 50, 125, 105, 80, 125, 105, 80, 50, 45], backgroundColor: '#b01a2c', borderRadius: 4 },
+            { label: 'Data Prospect', data: [100, 70, 85, 70, 100, 70, 85, 100, 70, 85, 70, 65], backgroundColor: '#27AE60', borderRadius: 4 }
         ]
     },
-    options: { 
-        responsive: true, 
-        plugins: { legend: { display: false } },
-        scales: { y: { display: false }, x: { grid: { display: false } } }
-    }
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
 });
 
-// 2. Status Pemohon Chart
+// 2. Status Pemohon Doughnut 
 new Chart(document.getElementById('statusChart'), {
     type: 'doughnut',
     data: {
         datasets: [{
-            data: counts,
+            data: statusCounts,
             backgroundColor: ['#2F80ED', '#27AE60', '#1C1C1E'],
             cutout: '82%',
             borderWidth: 0
@@ -168,18 +161,44 @@ new Chart(document.getElementById('statusChart'), {
     options: { plugins: { legend: { display: false } } }
 });
 
-// 3. Targetku Chart
+// 3. Targetku Semi-Circle 
 new Chart(document.getElementById('targetKuChart'), {
     type: 'doughnut',
     data: {
         datasets: [{
-            data: [counts[1], 200 - counts[1]], 
+            data: [60, 40],
             backgroundColor: ['#b01a2c', '#f8f8f8'],
             circumference: 180,
             rotation: 270,
             cutout: '88%',
             borderWidth: 0
         }]
+    },
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+});
+
+// 4. Target Cabang Multi-Ring Semi-Circle 
+new Chart(document.getElementById('targetCabangChart'), {
+    type: 'doughnut',
+    data: {
+        datasets: [
+            {
+                data: [60, 40],
+                backgroundColor: ['#b01a2c', '#f1f1f1'],
+                circumference: 180,
+                rotation: 270,
+                weight: 0.5,
+                cutout: '90%'
+            },
+            {
+                data: [46, 54],
+                backgroundColor: ['#27AE60', '#f1f1f1'],
+                circumference: 180,
+                rotation: 270,
+                weight: 0.5,
+                cutout: '90%'
+            }
+        ]
     },
     options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
 });
