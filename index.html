@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analitik Sales - Modul Dynamic</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { background-color: #f8f9fa; font-family: sans-serif; padding-bottom: 80px; }
+        .header-title { font-weight: bold; font-size: 20px; padding: 20px 15px; background: white; text-align: left; }
+        .card-custom { border: none; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin: 15px; padding: 15px; background: white; }
+        .chart-label { font-size: 14px; font-weight: 600; color: #333; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        
+        /* Bottom Navigation */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000; }
+        .nav-item { text-align: center; color: #999; text-decoration: none; font-size: 11px; }
+        .nav-item.active { color: #b01a2c; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header-title">Analitik</div>
+
+    <div class="card-custom">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="chart-label">Leads</div>
+            <span class="badge bg-light text-dark border">Tahunan ▾</span>
+        </div>
+        <p class="text-muted" style="font-size: 11px;">Grafik perbandingan pencapaian dan target leads</p>
+        <canvas id="leadsChart" height="200"></canvas>
+    </div>
+
+    <div class="card-custom">
+        <div class="chart-label mb-3">Status Pemohon</div>
+        <div class="row align-items-center">
+            <div class="col-6 position-relative">
+                <canvas id="statusChart"></canvas>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                    <h5 class="m-0 fw-bold" id="totalOrang">0</h5>
+                    <small class="text-muted" style="font-size: 10px;">Orang</small>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="small d-flex justify-content-between mb-2">
+                    <span><span class="legend-dot" style="background: #2F80ED;"></span> Waiting</span> <b id="countWaiting">0</b>
+                </div>
+                <div class="small d-flex justify-content-between mb-2">
+                    <span><span class="legend-dot" style="background: #27AE60;"></span> Response</span> <b id="countResponse">0</b>
+                </div>
+                <div class="small d-flex justify-content-between">
+                    <span><span class="legend-dot" style="background: #1C1C1E;"></span> Rejected</span> <b id="countRejected">0</b>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="#" class="nav-item">🏠<br>Beranda</a>
+        <a href="#" class="nav-item active">📊<br>Analitik</a>
+        <a href="#" class="nav-item">💼<br>Produk</a>
+        <a href="#" class="nav-item">👤<br>Akun</a>
+    </div>
+
+<script>
+// Data JSON Lead (Sesuai Permintaan)
+const data = [
+    {
+        "_id":"D2026031000028",
+        "status":{"lead":"ON PROCESS","credit_checking":"PASSED","survey":"DONE"},
+        "client":{"branch_name":"CABANG BEKASI 2"},
+        "pemohon":{
+            "name":"Ricky Harun",
+            "phone_number":"0845459445544",
+            "pekerjaan":{"name":"Pedagang"},
+            "ktp":{"address":"ciledug","city":"Kabupaten Cirebon","province":"Jawa Barat"}
+        },
+        "pengajuan":{
+            "product":{"product_name":"PINJAMAN - UMI"},
+            "submission":{"loan":5000000,"tenor":30}
+        },
+        "scoring_grade":"reject",
+        "rekomendasi":{"surveyor":{"status":"REKOMENDASI"},"credit_analyst":{"status":"REKOMENDASI"}}
+    },
+    {
+        "_id":"D2026031000029",
+        "status":{"lead":"DONE","credit_checking":"PASSED","survey":"DONE"},
+        "client":{"branch_name":"CABANG JAKARTA"},
+        "pemohon":{
+            "name":"Alpa Gustiana",
+            "phone_number":"08123456789",
+            "pekerjaan":{"name":"System Analyst"},
+            "ktp":{"address":"Tangerang","city":"Tangerang Selatan","province":"Banten"}
+        },
+        "pengajuan":{
+            "product":{"product_name":"PINJAMAN - MODAL"},
+            "submission":{"loan":10000000,"tenor":52}
+        },
+        "scoring_grade":"A",
+        "rekomendasi":{"surveyor":{"status":"REKOMENDASI"},"credit_analyst":{"status":"REKOMENDASI"}}
+    }
+];
+
+// Fungsi Memproses Data untuk Grafik
+function processAnalytics() {
+    let waiting = 0;   // Map from "ON PROCESS"
+    let response = 0;  // Map from "DONE"
+    let rejected = 0;  // Based on scoring_grade / status
+
+    data.forEach(item => {
+        if(item.status.lead === "ON PROCESS") waiting++;
+        if(item.status.lead === "DONE") response++;
+        if(item.scoring_grade === "reject") rejected++;
+    });
+
+    // Update Angka di UI
+    document.getElementById('totalOrang').innerText = data.length;
+    document.getElementById('countWaiting').innerText = waiting;
+    document.getElementById('countResponse').innerText = response;
+    document.getElementById('countRejected').innerText = rejected;
+
+    return [waiting, response, rejected];
+}
+
+// 1. Render Bar Chart (Leads Per Bulan - Dummy Data untuk Visual)
+new Chart(document.getElementById('leadsChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+        datasets: [
+            { label: 'Data Masuk', data: [120, 100, 80, 50, 130, 90], backgroundColor: '#b01a2c', borderRadius: 4 },
+            { label: 'Data Prospect', data: [90, 70, 85, 40, 100, 75], backgroundColor: '#27AE60', borderRadius: 4 }
+        ]
+    },
+    options: { 
+        responsive: true, 
+        plugins: { legend: { display: false } },
+        scales: { y: { display: false }, x: { grid: { display: false } } }
+    }
+});
+
+// 2. Render Doughnut Chart (Status Pemohon - Dynamic Data)
+const statusCounts = processAnalytics();
+new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Waiting', 'Response', 'Rejected'],
+        datasets: [{
+            data: statusCounts,
+            backgroundColor: ['#2F80ED', '#27AE60', '#1C1C1E'],
+            cutout: '80%',
+            borderWidth: 0
+        }]
+    },
+    options: { plugins: { legend: { display: false } } }
+});
+</script>
+
+</body>
+</html>
