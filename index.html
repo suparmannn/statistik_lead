@@ -3,56 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analitik Sales - Modul Dynamic</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Analitik Sales - Kospinus</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 
     <style>
-        body { background-color: #f8f9fa; font-family: sans-serif; padding-bottom: 80px; }
-        .header-title { font-weight: bold; font-size: 20px; padding: 20px 15px; background: white; text-align: left; }
-        .card-custom { border: none; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin: 15px; padding: 15px; background: white; }
-        .chart-label { font-size: 14px; font-weight: 600; color: #333; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; padding-bottom: 90px; }
+        .header-area { background: white; padding: 20px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .header-title { font-weight: 700; font-size: 22px; margin: 0; } /* [cite: 3, 16] */
+        .card-custom { border: none; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin: 15px; padding: 20px; background: white; }
+        .chart-label { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 5px; } /* [cite: 4, 18, 13, 27] */
+        .legend-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; margin-right: 8px; }
+        .sub-text { font-size: 11px; color: #888; margin-bottom: 15px; } /* [cite: 5, 20, 28] */
         
-        /* Bottom Navigation */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000; }
-        .nav-item { text-align: center; color: #999; text-decoration: none; font-size: 11px; }
-        .nav-item.active { color: #b01a2c; font-weight: bold; }
+        /* Bottom Navigation [cite: 50, 51, 52, 53] */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #f0f0f0; z-index: 1000; }
+        .nav-item { text-align: center; color: #bfbfbf; text-decoration: none; font-size: 11px; flex: 1; }
+        .nav-item.active { color: #b01a2c; font-weight: 700; }
+        .nav-icon { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
-    <div class="header-title">Analitik</div>
-
-    <div class="card-custom">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <div class="chart-label">Leads</div>
-            <span class="badge bg-light text-dark border">Tahunan ▾</span>
-        </div>
-        <p class="text-muted" style="font-size: 11px;">Grafik perbandingan pencapaian dan target leads</p>
-        <canvas id="leadsChart" height="200"></canvas>
+    <div class="header-area">
+        <h1 class="header-title">Analitik</h1>
+        <span style="font-size: 20px; color: #999;">ⓘ</span>
     </div>
 
     <div class="card-custom">
-        <div class="chart-label mb-3">Status Pemohon</div>
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="chart-label">Leads</div>
+            <button class="btn btn-sm border bg-light" style="font-size: 11px;">Tahunan ▾</button>
+        </div>
+        <p class="sub-text">Grafik perbandingan pencapaian dan target leads</p>
+        <canvas id="leadsChart" height="220"></canvas>
+    </div>
+
+    <div class="card-custom">
+        <div class="chart-label">Status Pemohon</div>
+        <p class="sub-text">Grafik perbandingan registrasi partner dengan maintain partner</p>
         <div class="row align-items-center">
             <div class="col-6 position-relative">
                 <canvas id="statusChart"></canvas>
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                    <h5 class="m-0 fw-bold" id="totalOrang">0</h5>
-                    <small class="text-muted" style="font-size: 10px;">Orang</small>
-                </div>
+                    <h4 class="m-0 fw-bold" id="totalCount">0</h4> <small class="text-muted" style="font-size: 10px;">Orang</small> </div>
             </div>
             <div class="col-6">
-                <div class="small d-flex justify-content-between mb-2">
-                    <span><span class="legend-dot" style="background: #2F80ED;"></span> Waiting</span> <b id="countWaiting">0</b>
-                </div>
-                <div class="small d-flex justify-content-between mb-2">
-                    <span><span class="legend-dot" style="background: #27AE60;"></span> Response</span> <b id="countResponse">0</b>
-                </div>
-                <div class="small d-flex justify-content-between">
-                    <span><span class="legend-dot" style="background: #1C1C1E;"></span> Rejected</span> <b id="countRejected">0</b>
-                </div>
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span><span class="legend-dot" style="background: #2F80ED;"></span> Waiting</span> <b id="valWaiting">0</b> </div>
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span><span class="legend-dot" style="background: #27AE60;"></span> Response</span> <b id="valResponse">0</b> </div>
+                <div class="d-flex justify-content-between small">
+                    <span><span class="legend-dot" style="background: #1C1C1E;"></span> Not Response</span> <b id="valNot">0</b> </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-custom">
+        <div class="chart-label mb-4">Pencapaian Target</div>
+        <div class="text-center mb-5">
+            <p class="small fw-bold mb-3">Targetku</p> <div style="height: 120px; position: relative;">
+                <canvas id="targetKuChart"></canvas>
+                <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);">
+                    <span style="color: #b01a2c; font-size: 11px;">● Leads (60%)</span> <h3 class="fw-bold m-0" id="leadsAchieved">0</h3> <small class="text-muted">/200 Leads</small> </div>
             </div>
         </div>
     </div>
@@ -65,73 +78,73 @@
     </div>
 
 <script>
-// Data JSON Lead (Sesuai Permintaan)
-const data = [
-    {
-        "_id":"D2026031000028",
-        "status":{"lead":"ON PROCESS","credit_checking":"PASSED","survey":"DONE"},
-        "client":{"branch_name":"CABANG BEKASI 2"},
-        "pemohon":{
-            "name":"Ricky Harun",
-            "phone_number":"0845459445544",
-            "pekerjaan":{"name":"Pedagang"},
-            "ktp":{"address":"ciledug","city":"Kabupaten Cirebon","province":"Jawa Barat"}
-        },
-        "pengajuan":{
-            "product":{"product_name":"PINJAMAN - UMI"},
-            "submission":{"loan":5000000,"tenor":30}
-        },
-        "scoring_grade":"reject",
-        "rekomendasi":{"surveyor":{"status":"REKOMENDASI"},"credit_analyst":{"status":"REKOMENDASI"}}
-    },
-    {
-        "_id":"D2026031000029",
-        "status":{"lead":"DONE","credit_checking":"PASSED","survey":"DONE"},
-        "client":{"branch_name":"CABANG JAKARTA"},
-        "pemohon":{
-            "name":"Alpa Gustiana",
-            "phone_number":"08123456789",
-            "pekerjaan":{"name":"System Analyst"},
-            "ktp":{"address":"Tangerang","city":"Tangerang Selatan","province":"Banten"}
-        },
-        "pengajuan":{
-            "product":{"product_name":"PINJAMAN - MODAL"},
-            "submission":{"loan":10000000,"tenor":52}
-        },
-        "scoring_grade":"A",
-        "rekomendasi":{"surveyor":{"status":"REKOMENDASI"},"credit_analyst":{"status":"REKOMENDASI"}}
-    }
+// Data diambil dari kospinus001.v_sales_leads_list.json
+const rawData = [
+    { "_id": "D2026031700006", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031700005", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
+    { "_id": "D2026031700004", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031700003", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031700002", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031700001", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031600003", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031600002", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
+    { "_id": "D2026031600001", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031400001", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031300010", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031300009", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031300008", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031300007", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031300006", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031300005", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031200069", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
+    { "_id": "D2026031200067", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
+    { "_id": "D2026031200059", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031200058", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
+    { "_id": "D2026031200053", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031200052", "status": { "lead": "WAITING" }, "scoring_grade": null },
+    { "_id": "D2026031200049", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
+    { "_id": "D2026031200048", "status": { "lead": "RESPONSE" }, "scoring_grade": "REJECT" },
+    { "_id": "D2026031200042", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031200039", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031200038", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031200037", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031200036", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" },
+    { "_id": "D2026031200035", "status": { "lead": "RESPONSE" }, "scoring_grade": "DONE" }
+    // ... (data berlanjut untuk entri lainnya dalam file)
 ];
 
-// Fungsi Memproses Data untuk Grafik
-function processAnalytics() {
-    let waiting = 0;   // Map from "ON PROCESS"
-    let response = 0;  // Map from "DONE"
-    let rejected = 0;  // Based on scoring_grade / status
+function processData() {
+    let waiting = 0;   // Status ON PROCESS [cite: 29]
+    let response = 0;  // Status DONE [cite: 32]
+    let notResponse = 0; // Lainnya [cite: 36]
 
-    data.forEach(item => {
-        if(item.status.lead === "ON PROCESS") waiting++;
-        if(item.status.lead === "DONE") response++;
-        if(item.scoring_grade === "reject") rejected++;
+    rawData.forEach(item => {
+        const s = item.status.lead.toUpperCase();
+        if(s === "ON PROCESS") waiting++;
+        else if(s === "DONE") response++;
+        else notResponse++;
     });
 
-    // Update Angka di UI
-    document.getElementById('totalOrang').innerText = data.length;
-    document.getElementById('countWaiting').innerText = waiting;
-    document.getElementById('countResponse').innerText = response;
-    document.getElementById('countRejected').innerText = rejected;
+    // Update elemen UI
+    document.getElementById('totalCount').innerText = rawData.length;
+    document.getElementById('valWaiting').innerText = waiting;
+    document.getElementById('valResponse').innerText = response;
+    document.getElementById('valNot').innerText = notResponse;
+    document.getElementById('leadsAchieved').innerText = response; 
 
-    return [waiting, response, rejected];
+    return [waiting, response, notResponse];
 }
 
-// 1. Render Bar Chart (Leads Per Bulan - Dummy Data untuk Visual)
+const counts = processData();
+
+// 1. Leads Chart (Dummy Data untuk tren bulanan)
 new Chart(document.getElementById('leadsChart'), {
     type: 'bar',
     data: {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
         datasets: [
-            { label: 'Data Masuk', data: [120, 100, 80, 50, 130, 90], backgroundColor: '#b01a2c', borderRadius: 4 },
-            { label: 'Data Prospect', data: [90, 70, 85, 40, 100, 75], backgroundColor: '#27AE60', borderRadius: 4 }
+            { label: 'Data Masuk', data: [125, 105, 80, 50, 125, 105], backgroundColor: '#b01a2c', borderRadius: 4 },
+            { label: 'Data Prospect', data: [100, 70, 85, 70, 100, 70], backgroundColor: '#27AE60', borderRadius: 4 }
         ]
     },
     options: { 
@@ -141,22 +154,35 @@ new Chart(document.getElementById('leadsChart'), {
     }
 });
 
-// 2. Render Doughnut Chart (Status Pemohon - Dynamic Data)
-const statusCounts = processAnalytics();
+// 2. Status Pemohon Chart
 new Chart(document.getElementById('statusChart'), {
     type: 'doughnut',
     data: {
-        labels: ['Waiting', 'Response', 'Rejected'],
         datasets: [{
-            data: statusCounts,
+            data: counts,
             backgroundColor: ['#2F80ED', '#27AE60', '#1C1C1E'],
-            cutout: '80%',
+            cutout: '82%',
             borderWidth: 0
         }]
     },
     options: { plugins: { legend: { display: false } } }
 });
-</script>
 
+// 3. Targetku Chart
+new Chart(document.getElementById('targetKuChart'), {
+    type: 'doughnut',
+    data: {
+        datasets: [{
+            data: [counts[1], 200 - counts[1]], 
+            backgroundColor: ['#b01a2c', '#f8f8f8'],
+            circumference: 180,
+            rotation: 270,
+            cutout: '88%',
+            borderWidth: 0
+        }]
+    },
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+});
+</script>
 </body>
 </html>
